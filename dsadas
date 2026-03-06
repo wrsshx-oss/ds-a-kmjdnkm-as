@@ -2212,6 +2212,19 @@
             32 32,
           pointer;
       }
+      #miniRadar {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 100;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        border-radius: 4px;
+        background: rgba(0, 0, 0, 0.4);
+        box-shadow: 0 0 10px rgba(0, 150, 255, 0.3);
+      }
+      #miniRadarCanvas {
+        display: block;
+      }
     </style>
   </head>
   <body oncontextmenu="return false;">
@@ -2228,6 +2241,9 @@
       gtag("config", "UA-49553618-3");
     </script>
     <div id="canvaswrapper"></div>
+    <div id="miniRadar">
+      <canvas id="miniRadarCanvas" width="200" height="200"></canvas>
+    </div>
     <div id="overlay">
       <div id="preroll"></div>
       <div
@@ -6615,33 +6631,9 @@
                   (i.fillStyle = s),
                   i.fillRect(-0.05, -0.05, 0.1, 0.1),
                   this.OlO10.mode.drawRadarInfo(i),
-                  this.drawNicknamesOnRadar(i),
                   i.restore(),
                   (this.texture.needsUpdate = !0)
                 );
-              }),
-              (t.prototype.drawNicknamesOnRadar = function (t) {
-                var e, i, s, l, n, a, o, r;
-                if (null != this.OlO10.lll10.OO1I0.I0I10) {
-                  for (e in this.OlO10.lll10.OO1I0.I0I10) {
-                    if (!this.OlO10.lll10.OO1I0.I0I10.hasOwnProperty(e)) continue;
-                    i = this.OlO10.lll10.OO1I0.I0I10[e];
-                    if (null != i && null != i.O10O1 && null != i.O10O1.status) {
-                      s = i.O10O1.status;
-                      l = s.x / this.OlO10.O11II;
-                      n = -s.y / this.OlO10.O11II;
-                      a = this.OlO10.names.get(parseInt(e));
-                      if (null != a && a.length > 0) {
-                        (t.fillStyle = "rgba(255,255,255,0.8)");
-                        (t.font = "bold 10px Arial");
-                        (t.textAlign = "center");
-                        (t.textBaseline = "top");
-                        o = a.substring(0, 12);
-                        t.fillText(o, l, n + 0.08);
-                      }
-                    }
-                  }
-                }
               }),
               (t.prototype.O001O = function (t, e) {
                 return (
@@ -6751,8 +6743,7 @@
                   (i.textAlign = "center"),
                   i.restore(),
                   i.restore(),
-                  (this.texture2.needsUpdate = !0),
-                  this.updateNicknamesCanvas()
+                  (this.texture2.needsUpdate = !0)
                 );
               }),
               (t.prototype.updateRepulsor = function (t) {
@@ -6959,60 +6950,6 @@
                     )),
                   (this.texture.needsUpdate = !0)
                 );
-              }),
-              (t.prototype.updateNicknamesCanvas = function () {
-                var e, i, s, l, n, a, o, r;
-                if (null == this.nicknameCanvas) {
-                  (this.nicknameCanvas = document.createElement("canvas")),
-                    (this.nicknameCanvas.width = this.canvas.width),
-                    (this.nicknameCanvas.height = this.canvas.height),
-                    (this.nicknameTexture = new THREE.Texture(
-                      this.nicknameCanvas
-                    )),
-                    (this.nicknameTexture.minFilter = THREE.LinearFilter),
-                    (this.nicknameMaterial = new THREE.MeshBasicMaterial({
-                      map: this.nicknameTexture,
-                      transparent: !0,
-                      depthTest: !1,
-                      depthWrite: !1,
-                    })),
-                    (this.nicknameMesh = new THREE.Mesh(
-                      this.l0l0I,
-                      this.nicknameMaterial
-                    )),
-                    (this.nicknameMesh.position.z = 0.5),
-                    this.I00Il.parent.add(this.nicknameMesh);
-                }
-                if (
-                  null != this.nicknameCanvas &&
-                  null != this.OlO10.lll10.OO1I0.I0I10
-                ) {
-                  (e = this.nicknameCanvas.getContext("2d")),
-                    e.clearRect(0, 0, this.nicknameCanvas.width, this.nicknameCanvas.height),
-                    e.save(),
-                    e.translate(this.nicknameCanvas.width / 2, this.nicknameCanvas.height / 2),
-                    e.scale(this.nicknameCanvas.width / 2, this.nicknameCanvas.height / 2),
-                    (e.fillStyle = "rgba(255,255,255,0.8)"),
-                    (e.font = "10px Arial"),
-                    (e.textAlign = "center"),
-                    (e.textBaseline = "top");
-                  for (i in this.OlO10.lll10.OO1I0.I0I10) {
-                    if (!this.OlO10.lll10.OO1I0.I0I10.hasOwnProperty(i)) continue;
-                    s = this.OlO10.lll10.OO1I0.I0I10[i];
-                    if (null != s && null != s.O10O1 && null != s.O10O1.status) {
-                      l = s.O10O1.status;
-                      n = l.x / this.OlO10.O11II;
-                      a = -l.y / this.OlO10.O11II;
-                      o = this.OlO10.names.get(parseInt(i));
-                      if (null != o && o.length > 0) {
-                        r = o.substring(0, 12);
-                        e.fillText(r, n, a + 0.08);
-                      }
-                    }
-                  }
-                  e.restore(),
-                    (this.nicknameTexture.needsUpdate = !0);
-                }
               }),
               t
             );
@@ -66514,6 +66451,87 @@
             return translations.exists(t, e);
           }),
           (module.exports = translations));
+      })();
+    </script>
+  </body>
+</html>
+    <script>
+      // Mini Radar with Nicknames
+      (function() {
+        var miniRadarCanvas = document.getElementById('miniRadarCanvas');
+        var ctx = miniRadarCanvas.getContext('2d');
+        var radarSize = 200;
+        var gameInstance = null;
+        
+        function updateMiniRadar() {
+          if (!gameInstance || !gameInstance.lll10 || !gameInstance.lll10.OO1I0) {
+            setTimeout(updateMiniRadar, 100);
+            return;
+          }
+          
+          ctx.fillStyle = 'rgba(0, 20, 40, 0.8)';
+          ctx.fillRect(0, 0, radarSize, radarSize);
+          
+          // Draw border circle
+          ctx.strokeStyle = 'rgba(0, 150, 255, 0.5)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.arc(radarSize / 2, radarSize / 2, radarSize / 2 - 5, 0, Math.PI * 2);
+          ctx.stroke();
+          
+          var playerShips = gameInstance.lll10.OO1I0.I0I10;
+          var playerPos = gameInstance.lll10.I0OI1.status;
+          var mapSize = gameInstance.l1IOl || 1000;
+          var scale = (radarSize - 20) / mapSize;
+          
+          if (playerShips && playerPos) {
+            for (var id in playerShips) {
+              if (!playerShips.hasOwnProperty(id)) continue;
+              
+              var ship = playerShips[id];
+              if (!ship || !ship.O10O1 || !ship.O10O1.status) continue;
+              
+              var status = ship.O10O1.status;
+              var x = (status.x - playerPos.x) * scale + radarSize / 2;
+              var y = (status.y - playerPos.y) * scale + radarSize / 2;
+              
+              // Draw ship point
+              var isPlayer = (status.id === playerPos.id);
+              ctx.fillStyle = isPlayer ? 'rgba(0, 255, 100, 0.8)' : 'rgba(100, 150, 255, 0.6)';
+              ctx.beginPath();
+              ctx.arc(x, y, 3, 0, Math.PI * 2);
+              ctx.fill();
+              
+              // Draw nickname
+              var name = gameInstance.names ? gameInstance.names.get(parseInt(id)) : '';
+              if (name && name.length > 0) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                ctx.font = 'bold 9px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                var shortName = name.substring(0, 10);
+                ctx.fillText(shortName, x, y + 8);
+              }
+            }
+          }
+          
+          // Draw player at center
+          ctx.fillStyle = 'rgba(0, 255, 100, 1)';
+          ctx.beginPath();
+          ctx.arc(radarSize / 2, radarSize / 2, 5, 0, Math.PI * 2);
+          ctx.fill();
+          
+          requestAnimationFrame(updateMiniRadar);
+        }
+        
+        // Wait for game instance to be ready
+        var checkInterval = setInterval(function() {
+          if (window.gameloop && window.gameloop.OlO10) {
+            gameInstance = window.gameloop.OlO10;
+            clearInterval(checkInterval);
+            updateMiniRadar();
+          }
+        }, 100);
       })();
     </script>
   </body>
